@@ -14,8 +14,8 @@ def elige_palabra(fichero="palabras.txt"):
         lineas = f.readlines()
     # Quitar saltos de línea y espacios
     palabras = [linea.strip() for linea in lineas if linea.strip() != ""]
-    return random.choice(palabras)
-
+    cadena = random.choice(palabras)
+    return cadena
 
 def normalizar(cadena):
     """
@@ -30,10 +30,17 @@ def normalizar(cadena):
     Devuelve:
       Cadena de texto con la palabra normalizada
     """
-    # TODO: Implementa esta función (y elimina la instrucción pass)
-    pass
+    cadena = cadena.lower()
+    cadena = cadena.strip()
+    cadena = cadena.replace("á","a")
+    cadena = cadena.replace("é","e")
+    cadena = cadena.replace("í","i")
+    cadena = cadena.replace("ó","o")
+    cadena = cadena.replace("ú","u")
+    cadena = cadena.replace("ü","u")
+    return cadena
 
-def ocultar(palabra_secreta, letras_usadas=""):
+def ocultar(cadena, letras_usadas=""):
     '''Devuelve una cadena de texto con la palabra enmascarada. 
     Las letras que no están en letras_usadas se muestran como guiones bajos (_).
 
@@ -44,27 +51,59 @@ def ocultar(palabra_secreta, letras_usadas=""):
     Devuelve:
       Cadena de texto con la palabra enmascarada
     '''
-    # TODO: Implementa esta función (y elimina la instrucción pass)
-    pass
-
+    palabra_enmascarada = ""
+    for letra in cadena:
+        if letra in letras_usadas:
+            palabra_enmascarada += letra
+        else:
+            palabra_enmascarada += "_"
+    return palabra_enmascarada
 
 def ha_ganado(palabra_enmascarada):
-    '''Devuelve True si el jugador ha ganado (es decir, si no quedan letras por descubrir en la palabra enmascarada).
+    '''Devuelve True si el jugador ha ganado (es decir, si no quedan letras por descubrir en la palabra enmascarada).'''
+    if "_" in palabra_enmascarada:
+        return False
+    else:
+        return True
 
-    Parámetros:
-    - palabra_enmascarada: cadena de texto con la palabra enmascarada 
+def mostrar_estado(palabra_enmascarada, letras_usadas, intentos_restantes):
+    print("Estado:", " ".join(palabra_enmascarada))
+    print("Letras usadas:", letras_usadas if letras_usadas else "Ninguna")
+    print("Intentos restantes:", intentos_restantes)
 
-    Devuelve:
-    - True si el jugador ha ganado, False en caso contrario
-    '''
-    # TODO: Implementa esta función (y elimina la instrucción pass)
-    pass
+def pedir_letra(letras_usadas):
+    letra = input("Introduce una letra: ").lower()
+    while not letra.isalpha():  # solo letras
+        print("Solo son válidas las letras")
+        letra = input("Introduce una letra: ").lower()
+    while len(letra) > 1:
+        print("Solo una letra")
+        letra = input("Introduce una letra: ").lower()
+    while letra in letras_usadas:
+        print("Esa letra ya la has dicho")
+        letra = input("Introduce una letra: ").lower()
+    return letra
 
+def jugar(cadena, intentos_restantes=6):
+    cadena = normalizar(cadena)
+    letras_usadas = ""
+    palabra_enmascarada = ocultar(cadena, letras_usadas)
+    while intentos_restantes > 0 and not ha_ganado(palabra_enmascarada):
+        mostrar_estado(palabra_enmascarada, letras_usadas, intentos_restantes)
+        letra = pedir_letra(letras_usadas)
+        letras_usadas += letra 
+        if letra not in cadena:
+            print("Esta letra no está en la palabra")
+            intentos_restantes -= 1
+        else:
+            print("¡Has acertado la letra!")
+        # ✅ CORREGIDO: ahora sí usa las letras acumuladas
+        palabra_enmascarada = ocultar(cadena, letras_usadas)
+    if ha_ganado(palabra_enmascarada):
+        print("¡Has ganado!")
+    else:
+        print("Has perdido, la palabra era", cadena)
 
-# TODO: Implementa la función mostrar_estado
-
-# TODO: Implementa la función pedir_letra
-
-# TODO: Implementa la función jugar
-
-# TODO: Escribe el programa principal
+# Programa principal
+cadena = elige_palabra("palabras.txt")
+jugar(cadena)
